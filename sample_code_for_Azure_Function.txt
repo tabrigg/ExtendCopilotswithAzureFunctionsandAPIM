@@ -1,0 +1,90 @@
+#r "Newtonsoft.Json"
+
+using System;
+using System.Net;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+
+public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
+{
+    log.LogInformation("C# HTTP trigger function processed a request.");
+
+    //string name = req.Query["name"];
+    string employeeId = req.Query["employeeId"];
+
+    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+    dynamic data = JsonConvert.DeserializeObject(requestBody);
+    //name = name ?? data?.name;
+    employeeId = employeeId ?? data?.employeeId;
+
+    log.LogInformation($"Retrieving vacation details for employee ID: {employeeId}");
+
+    string responseMessage = string.IsNullOrEmpty(employeeId)
+        ? "This HTTP triggered function executed successfully. Pass an employeeId in the query string or in the request body for a personalized response."
+                : $"Hello, {employeeId}. This HTTP triggered function executed successfully.";
+
+        // Hardcoded vacation details based on the provided JSON data
+        string jsonData = @"
+        {
+          ""annualLeaveEntitlement"": {
+            ""totalEntitlement"": 28,
+            ""entitlementUnit"": ""days"",
+            ""accrualRate"": ""2.33 days per month"",
+            ""accrualPeriod"": ""monthly"",
+            ""policyDetails"": ""Includes 8 public holidays""
+          },
+          ""RemainingAnnualLeave"": {
+            ""totalRemaining"": 15,
+            ""remainingUnit"": ""days"",
+            ""asOfDate"": ""2024-01-25""
+          },
+          ""scheduledVacations"": [
+            {
+              ""vacationId"": ""vac001"",
+              ""employeeId"": ""1001"",
+              ""startDate"": ""2024-01-29"",
+              ""endDate"": ""2024-01-30"",
+              ""duration"": 2,
+              ""status"": ""approved""
+            },
+            {
+              ""vacationId"": ""vac002"",
+              ""employeeId"": ""1001"",
+              ""startDate"": ""2024-02-15"",
+              ""endDate"": ""2024-02-19"",
+              ""duration"": 5,
+              ""status"": ""pending approval""
+            }
+          ]
+        }";
+
+        // Parse the JSON data
+        dynamic vacationData = JsonConvert.DeserializeObject(jsonData);
+
+        // Search for employee's scheduled vacations
+        dynamic scheduledVacations = vacationData.scheduledVacations;
+        dynamic employeeVacations = new JArray();
+        foreach (var vacation in scheduledVacations)
+        {
+            if (vacation.employeeId == employeeId)
+            {
+                employeeVacations.Add(vacation);
+            }
+        }        
+
+        // Return the employee's vacation details
+        //return new OkObjectResult(employeeVacations);
+        return new OkObjectResult(vacationData);
+
+        //Return the employee's annualLeaveEntitlement
+
+        //Return the employee's RemainingAnnualLeave
+
+        //return new OkObjectResult(responseMessage);
+}

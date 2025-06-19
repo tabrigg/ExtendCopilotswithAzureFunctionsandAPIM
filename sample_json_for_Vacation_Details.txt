@@ -1,0 +1,30 @@
+{
+  "annualLeaveEntitlement": {
+    "totalEntitlement": 28,
+    "entitlementUnit": "days",
+    "accrualRate": "2.33 days per month",
+    "accrualPeriod": "monthly",
+    "policyDetails": "Includes 8 public holidays"
+  },
+  "PemainingAnnualLeave": {
+    "totalRemaining": 15,
+    "remainingUnit": "days",
+    "asOfDate": "2024-01-25"
+  },
+  "scheduledVacations": [
+    {
+      "vacationId": "vac001",
+      "startDate": "2024-01-29",
+      "endDate": "2024-01-30",
+      "duration": 2,
+      "status": "approved"
+    },
+    {
+      "vacationId": "vac002",
+      "startDate": "2024-02-15",
+      "endDate": "2024-02-19",
+      "duration": 5,
+      "status": "pending approval"
+    }
+  ]
+}
